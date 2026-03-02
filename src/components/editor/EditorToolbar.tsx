@@ -5,7 +5,7 @@ import {
   Bold, Italic, Underline, Strikethrough, Code, Heading1, Heading2, Heading3,
   List, ListOrdered, ListChecks, Quote, Minus, Image, Link, Table,
   AlignLeft, AlignCenter, AlignRight, Highlighter, Undo2, Redo2,
-  Copy, SmilePlus, Palette, CodeXml,
+  Copy, SmilePlus, Palette, CodeXml, SeparatorHorizontal,
 } from "lucide-react"
 import { useCallback, useState } from "react"
 import copyToClipboard from "copy-to-clipboard"
@@ -14,6 +14,7 @@ interface ToolbarProps {
   editor: Editor
   onIconClick: () => void
   onEmojiClick: () => void
+  onDividerClick: () => void
 }
 
 function ToolbarButton({
@@ -50,13 +51,12 @@ function Separator() {
   return <div className="w-px h-5 bg-gray-200 mx-1" />
 }
 
-export function EditorToolbar({ editor, onIconClick, onEmojiClick }: ToolbarProps) {
+export function EditorToolbar({ editor, onIconClick, onEmojiClick, onDividerClick }: ToolbarProps) {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle")
 
   const addImage = useCallback(() => {
     const url = window.prompt("输入图片URL（远程图片将自动代理下载）:")
     if (!url) return
-    // For now insert directly; in Phase 1 we'll add proxy fetch
     editor.chain().focus().setImage({ src: url }).run()
   }, [editor])
 
@@ -68,7 +68,6 @@ export function EditorToolbar({ editor, onIconClick, onEmojiClick }: ToolbarProp
 
   const copyToWechat = useCallback(() => {
     const html = editor.getHTML()
-    // Wrap with theme styles for clipboard
     const styledHtml = `<div class="wx-content">${html}</div>`
     copyToClipboard(styledHtml, { format: "text/html" })
     setCopyStatus("copied")
@@ -163,6 +162,9 @@ export function EditorToolbar({ editor, onIconClick, onEmojiClick }: ToolbarProp
       </ToolbarButton>
       <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="分割线">
         <Minus size={s} />
+      </ToolbarButton>
+      <ToolbarButton onClick={onDividerClick} title="插入分隔线 (24款装饰线)">
+        <SeparatorHorizontal size={s} />
       </ToolbarButton>
       <ToolbarButton onClick={addTable} title="插入表格">
         <Table size={s} />

@@ -19,12 +19,15 @@ import { Typography } from "@tiptap/extension-typography"
 import { TextStyle, Color } from "@tiptap/extension-text-style"
 import { common, createLowlight } from "lowlight"
 import { useState, useCallback } from "react"
+import { Star, Github } from "lucide-react"
 import { EditorToolbar } from "./EditorToolbar"
 import { PreviewPanel } from "./PreviewPanel"
 import { ThemeSelector } from "../themes/ThemeSelector"
 import { IconPickerDialog } from "../icons/IconPickerDialog"
 import { EmojiPickerDialog } from "../emoji/EmojiPickerDialog"
+import { DividerPickerDialog } from "../dividers/DividerPickerDialog"
 import { themes } from "@/data/themes"
+import { defaultStyleConfig, type StyleConfig } from "./StyleSettings"
 
 const lowlight = createLowlight(common)
 
@@ -32,7 +35,9 @@ export function WxEditor() {
   const [activeTheme, setActiveTheme] = useState(themes[0])
   const [showIconPicker, setShowIconPicker] = useState(false)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [showDividerPicker, setShowDividerPicker] = useState(false)
   const [showPreview, setShowPreview] = useState(true)
+  const [styleConfig, setStyleConfig] = useState<StyleConfig>(defaultStyleConfig)
 
   const editor = useEditor({
     extensions: [
@@ -97,6 +102,15 @@ export function WxEditor() {
     [editor]
   )
 
+  const insertDivider = useCallback(
+    (html: string) => {
+      if (!editor) return
+      editor.chain().focus().insertContent(html).run()
+      setShowDividerPicker(false)
+    },
+    [editor]
+  )
+
   if (!editor) return null
 
   return (
@@ -110,6 +124,22 @@ export function WxEditor() {
           <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Beta</span>
         </div>
         <div className="flex items-center gap-2">
+          {/* GitHub Star CTA */}
+          <a
+            href="https://github.com/upgiorgio/wx-editor"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition group"
+          >
+            <Github size={14} />
+            <Star size={12} className="text-yellow-400 group-hover:fill-yellow-400 transition" />
+            <span className="hidden sm:inline">Star on GitHub</span>
+            <span className="sm:hidden">Star</span>
+          </a>
+          <span className="hidden md:inline text-[10px] text-gray-400">免费开源</span>
+
+          <div className="w-px h-5 bg-gray-200 mx-1" />
+
           <ThemeSelector
             themes={themes}
             activeTheme={activeTheme}
@@ -133,6 +163,7 @@ export function WxEditor() {
         editor={editor}
         onIconClick={() => setShowIconPicker(true)}
         onEmojiClick={() => setShowEmojiPicker(true)}
+        onDividerClick={() => setShowDividerPicker(true)}
       />
 
       {/* Editor + Preview */}
@@ -149,23 +180,27 @@ export function WxEditor() {
         {/* Preview */}
         {showPreview && (
           <div className="w-1/2 overflow-y-auto bg-white">
-            <PreviewPanel editor={editor} theme={activeTheme} />
+            <PreviewPanel editor={editor} theme={activeTheme} styleConfig={styleConfig} onStyleChange={setStyleConfig} />
           </div>
         )}
       </div>
 
-      {/* Icon Picker Dialog */}
+      {/* Dialogs */}
       <IconPickerDialog
         open={showIconPicker}
         onClose={() => setShowIconPicker(false)}
         onSelect={insertIcon}
       />
-
-      {/* Emoji Picker Dialog */}
       <EmojiPickerDialog
         open={showEmojiPicker}
         onClose={() => setShowEmojiPicker(false)}
         onSelect={insertEmoji}
+      />
+      <DividerPickerDialog
+        open={showDividerPicker}
+        onClose={() => setShowDividerPicker(false)}
+        onSelect={insertDivider}
+        tintColor={styleConfig.primaryColor}
       />
     </div>
   )
