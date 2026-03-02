@@ -19,7 +19,7 @@ import { Typography } from "@tiptap/extension-typography"
 import { TextStyle, Color } from "@tiptap/extension-text-style"
 import { common, createLowlight } from "lowlight"
 import { useState, useCallback } from "react"
-import { Star, Github } from "lucide-react"
+import { Star, Github, Eye, EyeOff } from "lucide-react"
 import { EditorToolbar } from "./EditorToolbar"
 import { PreviewPanel } from "./PreviewPanel"
 import { ThemeSelector } from "../themes/ThemeSelector"
@@ -79,11 +79,7 @@ export function WxEditor() {
   const insertIcon = useCallback(
     (iconUrl: string, alt: string) => {
       if (!editor) return
-      editor
-        .chain()
-        .focus()
-        .setImage({ src: iconUrl, alt, title: alt })
-        .run()
+      editor.chain().focus().setImage({ src: iconUrl, alt, title: alt }).run()
       setShowIconPicker(false)
     },
     [editor]
@@ -92,11 +88,7 @@ export function WxEditor() {
   const insertEmoji = useCallback(
     (emojiUrl: string, alt: string) => {
       if (!editor) return
-      editor
-        .chain()
-        .focus()
-        .setImage({ src: emojiUrl, alt, title: alt })
-        .run()
+      editor.chain().focus().setImage({ src: emojiUrl, alt, title: alt }).run()
       setShowEmojiPicker(false)
     },
     [editor]
@@ -114,29 +106,39 @@ export function WxEditor() {
   if (!editor) return null
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Top Bar */}
-      <header className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <h1 className="text-lg font-bold text-gray-800">
-            <span className="text-emerald-600">WX</span> Editor
-          </h1>
-          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Beta</span>
+    <div className="flex flex-col h-screen">
+      {/* Header */}
+      <header className="glass border-b border-white/20 px-5 py-2.5 flex items-center justify-between shrink-0 shadow-sm z-10">
+        <div className="flex items-center gap-4">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-200">
+              <span className="text-white font-black text-sm">W</span>
+            </div>
+            <div>
+              <h1 className="text-base font-bold text-gray-800 leading-tight">
+                <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">WX</span>
+                <span className="text-gray-700"> Editor</span>
+              </h1>
+              <p className="text-[10px] text-gray-400 leading-tight -mt-0.5">下一代微信排版编辑器</p>
+            </div>
+          </div>
+          <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Beta</span>
         </div>
+
         <div className="flex items-center gap-2">
           {/* GitHub Star CTA */}
           <a
             href="https://github.com/upgiorgio/wx-editor"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition group"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-700 hover:to-gray-800 transition-all shadow-sm hover:shadow-md group"
           >
             <Github size={14} />
-            <Star size={12} className="text-yellow-400 group-hover:fill-yellow-400 transition" />
-            <span className="hidden sm:inline">Star on GitHub</span>
-            <span className="sm:hidden">Star</span>
+            <Star size={11} className="text-yellow-400 group-hover:fill-yellow-400 transition" />
+            <span className="hidden sm:inline font-medium">Star</span>
           </a>
-          <span className="hidden md:inline text-[10px] text-gray-400">免费开源</span>
+          <span className="hidden lg:inline text-[10px] text-gray-400 font-medium bg-gray-100 px-2 py-0.5 rounded-full">免费开源</span>
 
           <div className="w-px h-5 bg-gray-200 mx-1" />
 
@@ -147,13 +149,14 @@ export function WxEditor() {
           />
           <button
             onClick={() => setShowPreview(!showPreview)}
-            className={`px-3 py-1.5 text-sm rounded-md transition ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all shadow-sm ${
               showPreview
-                ? "bg-emerald-100 text-emerald-700"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-emerald-200"
+                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
             }`}
           >
-            {showPreview ? "隐藏预览" : "显示预览"}
+            {showPreview ? <Eye size={13} /> : <EyeOff size={13} />}
+            {showPreview ? "预览" : "预览"}
           </button>
         </div>
       </header>
@@ -167,19 +170,19 @@ export function WxEditor() {
       />
 
       {/* Editor + Preview */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Editor */}
+      <div className="flex flex-1 overflow-hidden mx-3 mb-3 gap-3">
+        {/* Editor Panel */}
         <div
           className={`${
             showPreview ? "w-1/2" : "w-full"
-          } overflow-y-auto bg-white border-r border-gray-200`}
+          } overflow-y-auto bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100`}
         >
           <EditorContent editor={editor} />
         </div>
 
-        {/* Preview */}
+        {/* Preview Panel */}
         {showPreview && (
-          <div className="w-1/2 overflow-y-auto bg-white">
+          <div className="w-1/2 overflow-hidden bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 flex flex-col">
             <PreviewPanel editor={editor} theme={activeTheme} styleConfig={styleConfig} onStyleChange={setStyleConfig} />
           </div>
         )}

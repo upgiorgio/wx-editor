@@ -39,18 +39,18 @@ export function DividerPickerDialog({ open, onClose, onSelect, tintColor }: Divi
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm dialog-backdrop" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-2xl w-[640px] max-h-[70vh] flex flex-col overflow-hidden"
+        className="bg-white rounded-2xl shadow-2xl w-[640px] max-h-[70vh] flex flex-col overflow-hidden border border-gray-100 dialog-panel"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-800">插入分隔线</h2>
+        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-transparent">
+          <h2 className="text-base font-bold text-gray-800">插入分隔线</h2>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">{dividers.length} 款精选分隔线</span>
-            <button onClick={onClose} className="p-1 rounded-md hover:bg-gray-100">
-              <X size={18} className="text-gray-400" />
+            <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full font-medium">{dividers.length} 款精选</span>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 transition">
+              <X size={16} className="text-gray-400" />
             </button>
           </div>
         </div>
@@ -58,14 +58,14 @@ export function DividerPickerDialog({ open, onClose, onSelect, tintColor }: Divi
         {/* Search */}
         <div className="px-5 pt-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="搜索分隔线... (如: 波浪, star, flower)"
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition"
             />
           </div>
         </div>
@@ -77,9 +77,9 @@ export function DividerPickerDialog({ open, onClose, onSelect, tintColor }: Divi
               <button
                 key={cat.id}
                 onClick={() => setCategory(cat.id)}
-                className={`shrink-0 px-2.5 py-1 text-xs rounded-full transition ${
+                className={`shrink-0 px-3 py-1 text-xs rounded-full font-medium transition-all ${
                   category === cat.id
-                    ? "bg-emerald-100 text-emerald-700"
+                    ? "bg-emerald-500 text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                 }`}
               >
@@ -96,7 +96,7 @@ export function DividerPickerDialog({ open, onClose, onSelect, tintColor }: Divi
               <button
                 key={d.id}
                 onClick={() => handleSelect(i)}
-                className="group flex flex-col gap-1 p-3 rounded-lg border border-gray-100 hover:border-emerald-300 hover:bg-emerald-50/30 transition"
+                className="group flex flex-col gap-1.5 p-4 rounded-xl border border-gray-100 hover:border-emerald-300 hover:bg-emerald-50/20 hover:shadow-sm transition-all"
                 title={d.name}
               >
                 <div className="w-full h-8 flex items-center justify-center overflow-hidden">
@@ -107,14 +107,14 @@ export function DividerPickerDialog({ open, onClose, onSelect, tintColor }: Divi
                     style={{ maxHeight: "28px" }}
                   />
                 </div>
-                <span className="text-[11px] text-gray-400 group-hover:text-emerald-600 transition">
+                <span className="text-[11px] text-gray-400 group-hover:text-emerald-600 font-medium transition">
                   {d.name}
                 </span>
               </button>
             ))}
           </div>
           {items.length === 0 && (
-            <div className="text-center py-12 text-gray-400 text-sm">
+            <div className="text-center py-16 text-gray-400 text-sm">
               未找到匹配的分隔线
             </div>
           )}

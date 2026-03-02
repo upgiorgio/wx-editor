@@ -13,7 +13,7 @@ interface EmojiPickerDialogProps {
 }
 
 const emojiStyles: { id: EmojiStyle; name: string; desc: string }[] = [
-  { id: "twemoji", name: "Twemoji", desc: "Twitter 扁平风格" },
+  { id: "twemoji", name: "Twemoji", desc: "Twitter 风格" },
   { id: "fluent-emoji-flat", name: "Fluent", desc: "Microsoft 风格" },
   { id: "noto", name: "Noto", desc: "Google 风格" },
   { id: "openmoji", name: "OpenMoji", desc: "开放风格" },
@@ -56,19 +56,12 @@ export function EmojiPickerDialog({ open, onClose, onSelect }: EmojiPickerDialog
       if (!q.trim()) return
       setLoading(true)
       try {
-        const params = new URLSearchParams({
-          query: q,
-          limit: "80",
-          prefixes: style,
-        })
+        const params = new URLSearchParams({ query: q, limit: "80", prefixes: style })
         const res = await fetch(`https://api.iconify.design/search?${params}`)
         const data = await res.json()
         setResults(data.icons || [])
-      } catch {
-        setResults([])
-      } finally {
-        setLoading(false)
-      }
+      } catch { setResults([]) }
+      finally { setLoading(false) }
     },
     [style]
   )
@@ -87,7 +80,6 @@ export function EmojiPickerDialog({ open, onClose, onSelect }: EmojiPickerDialog
 
   const handleStyleChange = (s: EmojiStyle) => {
     setStyle(s)
-    // Re-search with new style
     setTimeout(() => searchEmoji(query || category.query), 50)
   }
 
@@ -100,33 +92,33 @@ export function EmojiPickerDialog({ open, onClose, onSelect }: EmojiPickerDialog
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm dialog-backdrop" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-2xl w-[680px] max-h-[80vh] flex flex-col overflow-hidden"
+        className="bg-white rounded-2xl shadow-2xl w-[680px] max-h-[80vh] flex flex-col overflow-hidden border border-gray-100 dialog-panel"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-800">插入 Emoji</h2>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-gray-100">
-            <X size={18} className="text-gray-400" />
+        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-transparent">
+          <h2 className="text-base font-bold text-gray-800">插入 Emoji</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 transition">
+            <X size={16} className="text-gray-400" />
           </button>
         </div>
 
         {/* Style selector */}
-        <div className="flex items-center gap-2 px-5 pt-3">
+        <div className="flex items-center gap-1.5 px-5 pt-3">
           {emojiStyles.map((s) => (
             <button
               key={s.id}
               onClick={() => handleStyleChange(s.id)}
-              className={`px-3 py-1.5 text-sm rounded-lg transition ${
+              className={`px-3 py-1.5 text-sm rounded-lg font-medium transition-all ${
                 style === s.id
-                  ? "bg-emerald-100 text-emerald-700 font-medium"
-                  : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+                  ? "bg-emerald-500 text-white shadow-sm shadow-emerald-200"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
               }`}
             >
               {s.name}
-              <span className="text-[10px] ml-1 opacity-60">{s.desc}</span>
+              <span className="text-[10px] ml-1 opacity-70">{s.desc}</span>
             </button>
           ))}
         </div>
@@ -134,16 +126,16 @@ export function EmojiPickerDialog({ open, onClose, onSelect }: EmojiPickerDialog
         {/* Search */}
         <div className="px-5 pt-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => handleQueryChange(e.target.value)}
               placeholder="搜索 emoji... (如: smile, heart, fire, rocket)"
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition"
             />
-            {loading && <Loader2 size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />}
+            {loading && <Loader2 size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-500 animate-spin" />}
           </div>
         </div>
 
@@ -153,9 +145,9 @@ export function EmojiPickerDialog({ open, onClose, onSelect }: EmojiPickerDialog
             <button
               key={cat.id}
               onClick={() => handleCategoryClick(cat)}
-              className={`shrink-0 px-2.5 py-1 text-xs rounded-full transition ${
+              className={`shrink-0 px-3 py-1 text-xs rounded-full font-medium transition-all ${
                 category.id === cat.id && !query
-                  ? "bg-emerald-100 text-emerald-700"
+                  ? "bg-emerald-500 text-white shadow-sm"
                   : "bg-gray-100 text-gray-500 hover:bg-gray-200"
               }`}
             >
@@ -171,8 +163,8 @@ export function EmojiPickerDialog({ open, onClose, onSelect }: EmojiPickerDialog
             <button
               key={s}
               onClick={() => setSize(s)}
-              className={`px-1.5 py-0.5 rounded ${
-                size === s ? "bg-emerald-100 text-emerald-700" : "hover:bg-gray-100"
+              className={`px-2 py-0.5 rounded-md font-medium transition ${
+                size === s ? "bg-emerald-500 text-white" : "hover:bg-gray-100"
               }`}
             >
               {s}
@@ -189,21 +181,15 @@ export function EmojiPickerDialog({ open, onClose, onSelect }: EmojiPickerDialog
                 <button
                   key={icon}
                   onClick={() => handleSelect(icon)}
-                  className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg hover:bg-gray-50 transition"
+                  className="flex flex-col items-center gap-0.5 p-2 rounded-xl hover:bg-gray-50 hover:shadow-sm transition-all border border-transparent hover:border-gray-200"
                   title={name}
                 >
-                  <img
-                    src={getIconUrl(prefix, name, 36)}
-                    alt={name}
-                    width={36}
-                    height={36}
-                    loading="lazy"
-                  />
+                  <img src={getIconUrl(prefix, name, 36)} alt={name} width={36} height={36} loading="lazy" />
                 </button>
               )
             })}
             {!loading && results.length === 0 && (
-              <div className="col-span-10 text-center py-12 text-gray-400 text-sm">
+              <div className="col-span-10 text-center py-16 text-gray-400 text-sm">
                 {query ? "未找到匹配的 Emoji" : "选择分类或搜索"}
               </div>
             )}

@@ -22,17 +22,14 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
-  // Load favorites from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("wx-editor-icon-favorites")
     if (saved) setFavorites(JSON.parse(saved))
   }, [])
 
-  // Focus input when opened
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 100)
-      // Load default icons
       if (results.length === 0 && !query) {
         searchIcons("home")
       }
@@ -40,10 +37,7 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
   }, [open])
 
   const searchIcons = useCallback(async (q: string) => {
-    if (!q.trim()) {
-      setResults([])
-      return
-    }
+    if (!q.trim()) { setResults([]); return }
     setLoading(true)
     try {
       const prefixes = selectedSet
@@ -51,7 +45,6 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
         : tab === "brands"
         ? ["simple-icons", "logos"]
         : iconSets.filter((s) => s.category === "ui").map((s) => s.prefix)
-
       const params = new URLSearchParams({
         query: q,
         limit: "80",
@@ -60,11 +53,8 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
       const res = await fetch(`https://api.iconify.design/search?${params}`)
       const data = await res.json()
       setResults(data.icons || [])
-    } catch {
-      setResults([])
-    } finally {
-      setLoading(false)
-    }
+    } catch { setResults([]) }
+    finally { setLoading(false) }
   }, [selectedSet, tab])
 
   const handleQueryChange = (value: string) => {
@@ -81,9 +71,7 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
 
   const toggleFavorite = (icon: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    const next = favorites.includes(icon)
-      ? favorites.filter((f) => f !== icon)
-      : [...favorites, icon]
+    const next = favorites.includes(icon) ? favorites.filter((f) => f !== icon) : [...favorites, icon]
     setFavorites(next)
     localStorage.setItem("wx-editor-icon-favorites", JSON.stringify(next))
   }
@@ -94,18 +82,18 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
   const brandSets = iconSets.filter((s) => s.category === "brand")
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm dialog-backdrop" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-2xl w-[720px] max-h-[80vh] flex flex-col overflow-hidden"
+        className="bg-white rounded-2xl shadow-2xl w-[720px] max-h-[80vh] flex flex-col overflow-hidden border border-gray-100 dialog-panel"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-800">插入图标</h2>
+        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-transparent">
+          <h2 className="text-base font-bold text-gray-800">插入图标</h2>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">Powered by Iconify · 290,000+ 图标</span>
-            <button onClick={onClose} className="p-1 rounded-md hover:bg-gray-100">
-              <X size={18} className="text-gray-400" />
+            <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full font-medium">Iconify · 290,000+</span>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 transition">
+              <X size={16} className="text-gray-400" />
             </button>
           </div>
         </div>
@@ -116,8 +104,10 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
             <button
               key={t}
               onClick={() => { setTab(t); setSelectedSet(null); setQuery(""); setResults([]) }}
-              className={`px-3 py-1.5 text-sm rounded-md transition ${
-                tab === t ? "bg-emerald-100 text-emerald-700 font-medium" : "text-gray-500 hover:bg-gray-100"
+              className={`px-3.5 py-1.5 text-sm rounded-lg font-medium transition-all ${
+                tab === t
+                  ? "bg-emerald-500 text-white shadow-sm shadow-emerald-200"
+                  : "text-gray-500 hover:bg-gray-100"
               }`}
             >
               {t === "icons" && "📦 图标库"}
@@ -130,16 +120,16 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
         {/* Search */}
         <div className="px-5 pt-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => handleQueryChange(e.target.value)}
               placeholder="搜索图标... (如: home, arrow, settings, chart)"
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition"
             />
-            {loading && <Loader2 size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />}
+            {loading && <Loader2 size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-500 animate-spin" />}
           </div>
         </div>
 
@@ -148,8 +138,8 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
           <div className="flex items-center gap-1.5 px-5 pt-2 pb-1 overflow-x-auto">
             <button
               onClick={() => { setSelectedSet(null); if (query) searchIcons(query) }}
-              className={`shrink-0 px-2.5 py-1 text-xs rounded-full transition ${
-                !selectedSet ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              className={`shrink-0 px-3 py-1 text-xs rounded-full font-medium transition-all ${
+                !selectedSet ? "bg-emerald-500 text-white shadow-sm" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
               }`}
             >
               全部
@@ -161,13 +151,13 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
                   setSelectedSet(set.prefix === selectedSet ? null : set.prefix)
                   if (query) setTimeout(() => searchIcons(query), 50)
                 }}
-                className={`shrink-0 px-2.5 py-1 text-xs rounded-full transition ${
+                className={`shrink-0 px-3 py-1 text-xs rounded-full font-medium transition-all ${
                   selectedSet === set.prefix
-                    ? "bg-emerald-100 text-emerald-700"
+                    ? "bg-emerald-500 text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                 }`}
               >
-                {set.name} ({set.total.toLocaleString()})
+                {set.name}
               </button>
             ))}
           </div>
@@ -181,8 +171,8 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
               <button
                 key={s}
                 onClick={() => setSize(s)}
-                className={`px-1.5 py-0.5 rounded ${
-                  size === s ? "bg-emerald-100 text-emerald-700" : "hover:bg-gray-100"
+                className={`px-2 py-0.5 rounded-md font-medium transition ${
+                  size === s ? "bg-emerald-500 text-white" : "hover:bg-gray-100"
                 }`}
               >
                 {s}
@@ -198,7 +188,7 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
               className="w-5 h-5 rounded cursor-pointer border-0"
             />
             {color && (
-              <button onClick={() => setColor("")} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setColor("")} className="text-gray-400 hover:text-gray-600 text-[11px]">
                 重置
               </button>
             )}
@@ -215,20 +205,14 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
                   <button
                     key={icon}
                     onClick={() => handleSelect(icon)}
-                    className="group relative flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-50 transition"
+                    className="group relative flex flex-col items-center gap-1 p-2.5 rounded-xl hover:bg-gray-50 hover:shadow-sm transition-all border border-transparent hover:border-gray-200"
                     title={icon}
                   >
-                    <img
-                      src={getIconUrl(prefix, name, 32, color || undefined)}
-                      alt={icon}
-                      width={32}
-                      height={32}
-                      loading="lazy"
-                    />
+                    <img src={getIconUrl(prefix, name, 32, color || undefined)} alt={icon} width={32} height={32} loading="lazy" />
                     <span className="text-[10px] text-gray-400 truncate w-full text-center">{name}</span>
                     <button
                       onClick={(e) => toggleFavorite(icon, e)}
-                      className="absolute top-0.5 right-0.5 opacity-0 group-hover:opacity-100 p-0.5"
+                      className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 p-0.5"
                     >
                       <Star size={10} className="fill-yellow-400 text-yellow-400" />
                     </button>
@@ -236,7 +220,7 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
                 )
               })}
               {favorites.length === 0 && (
-                <div className="col-span-8 text-center py-12 text-gray-400 text-sm">
+                <div className="col-span-8 text-center py-16 text-gray-400 text-sm">
                   还没有收藏的图标，搜索后点击 ⭐ 收藏
                 </div>
               )}
@@ -250,20 +234,14 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
                   <button
                     key={icon}
                     onClick={() => handleSelect(icon)}
-                    className="group relative flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-50 transition"
+                    className="group relative flex flex-col items-center gap-1 p-2.5 rounded-xl hover:bg-gray-50 hover:shadow-sm transition-all border border-transparent hover:border-gray-200"
                     title={icon}
                   >
-                    <img
-                      src={getIconUrl(prefix, name, 32, color || undefined)}
-                      alt={icon}
-                      width={32}
-                      height={32}
-                      loading="lazy"
-                    />
+                    <img src={getIconUrl(prefix, name, 32, color || undefined)} alt={icon} width={32} height={32} loading="lazy" />
                     <span className="text-[10px] text-gray-400 truncate w-full text-center">{name}</span>
                     <button
                       onClick={(e) => toggleFavorite(icon, e)}
-                      className="absolute top-0.5 right-0.5 opacity-0 group-hover:opacity-100 p-0.5"
+                      className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 p-0.5"
                     >
                       <Star size={10} className={isFav ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} />
                     </button>
@@ -271,12 +249,12 @@ export function IconPickerDialog({ open, onClose, onSelect }: IconPickerDialogPr
                 )
               })}
               {!loading && results.length === 0 && query && (
-                <div className="col-span-8 text-center py-12 text-gray-400 text-sm">
+                <div className="col-span-8 text-center py-16 text-gray-400 text-sm">
                   未找到匹配的图标，试试其他关键词
                 </div>
               )}
               {!loading && results.length === 0 && !query && (
-                <div className="col-span-8 text-center py-12 text-gray-400 text-sm">
+                <div className="col-span-8 text-center py-16 text-gray-400 text-sm">
                   输入关键词搜索 290,000+ 图标
                 </div>
               )}
